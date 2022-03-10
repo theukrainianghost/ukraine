@@ -14,6 +14,9 @@ now=$(date)
 git commit -m "$now"
 git push --force --set-upstream origin gh-pages
 cd ..
+rm -rf _config.yml
+cp _config.yml.githubcopy _config.yml
+JEKYLL_ENV=production jekyll build
 cd _site_github
 shopt -s extglob
 rm -rf !(.git)
