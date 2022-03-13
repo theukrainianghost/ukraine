@@ -30,7 +30,6 @@ else
     content=$(cat $rep)
     repru=$(echo $rep | sed 's/fr/ru/')
     repen=$(echo $rep | sed 's/fr/en/')
-    content=$(cat ./_i18n/fr/_posts/2022-01-01-test.markdown)
     title=$(echo $content | grep  -Po 'title: "\K[^"]*')
     titleru=$(python3 -m deepl --auth-key=$token text --to=RU "$title")
     titleen=$(python3 -m deepl --auth-key=$token text --to=EN-GB "$title")
