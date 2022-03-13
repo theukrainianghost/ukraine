@@ -136,6 +136,26 @@ table td { border: 1px solid #e8e8e8; }
 /** Posts */
 .post-header { margin-bottom: 30px; }
 
+.share-page {
+    text-align: center;
+    background: $secondary-color;
+    color: $light-color;
+    padding: 8px 15px;
+    border-radius: 5px;
+    margin: 1.5 * $spacing-unit 0;
+
+    a {
+        font-weight: 700;
+        color: #fff;
+        margin-left: 10px;
+
+        &:hover {
+            border-bottom: 1px dashed #fff;
+        }
+    }
+}
+
+
 .post-title { font-size: 42px; letter-spacing: -1px; line-height: 1; }
 
 @media screen and (max-width: 1000px) { .post-title { font-size: 36px; } }
@@ -296,5 +316,6 @@ table td { border: 1px solid #e8e8e8; }
 .pagination {
     text-align: center;
  }
+
 
 /*# sourceMappingURL=site.css.map */
