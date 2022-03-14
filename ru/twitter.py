@@ -17,7 +17,9 @@ api = tweepy.Client(bearer_token=sys.argv[5],
 # # Create a tweet
 message = """
 """+sys.argv[6]+"""
+
 """+sys.argv[8]+"""
+
 #россия #украина #геноцид #нетвойне #StandWithUkraine #РоссияСмотри #RussiaInvadedUkraine #RussiaUkraineWar #RussianWarCrimes
 """    
 api.create_tweet(text=message)
