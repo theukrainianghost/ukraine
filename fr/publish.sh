@@ -31,8 +31,8 @@ else
     repru=$(echo $rep | sed 's/fr/ru/')
     repen=$(echo $rep | sed 's/fr/en/')
     title=$(echo $content | grep  -Po 'title: "\K[^"]*')
-    titleru=$(python3 -m deepl --auth-key=$token text --to=RU "$title")
-    titleen=$(python3 -m deepl --auth-key=$token text --to=EN-GB "$title")
+    titleru=$(python3 -m deepl --auth-key=$token text --to=RU "$title" | sed "s/\"//g")
+    titleen=$(python3 -m deepl --auth-key=$token text --to=EN-GB "$title" | sed "s/\"//g")
     dateheure=$(echo $content | grep  -Po '(?<=date: ).*(?=categories)')
     dateheure=${dateheure::-1}
     newdateheure="$(date +"%Y-%m-%d %T") +0100"
@@ -42,7 +42,6 @@ else
     text=${text:1}
 
     textru=$(python3 -m deepl --auth-key=$token text --to=RU "$text")
-   
     texten=$(python3 -m deepl --auth-key=$token text --to=EN-GB "$text")
     content=$(echo "$content" | sed "s/$dateheure/$newdateheure/g")
     echo "$content" > $rep
