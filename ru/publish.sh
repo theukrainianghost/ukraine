@@ -37,9 +37,12 @@ else
     dateheure=${dateheure::-1}
     newdateheure="$(date +"%Y-%m-%d %T") +0100"
     text=$(echo $content | grep  -Po '(?<=translate-->).*(?=\<!--endtranslate)')
+    
     text=${text::-1}
     text=${text:1}
+
     textru=$(python3 -m deepl --auth-key=$token text --to=RU "$text")
+   
     texten=$(python3 -m deepl --auth-key=$token text --to=EN-GB "$text")
     content=$(echo "$content" | sed "s/$dateheure/$newdateheure/g")
     echo "$content" > $rep
@@ -53,6 +56,7 @@ else
     contenten=$(echo "$contenten" | sed "s/$text/$texten/g")
     echo "$contenten" > $repen
 fi
+
 
 
 rm -rf _config.yml
