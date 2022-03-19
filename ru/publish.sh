@@ -28,32 +28,46 @@ then
 else
     rep=$(echo $rep | sed 's/: //')
     content=$(cat $rep)
+    rm $rep
     repru=$(echo $rep | sed 's/fr/ru/')
     repen=$(echo $rep | sed 's/fr/en/')
-    title=$(echo $content | grep  -Po 'title: "\K[^"]*')
-    titleru=$(python3 -m deepl --auth-key=$token text --to=RU "$title" | sed "s/\"//g")
-    titleen=$(python3 -m deepl --auth-key=$token text --to=EN-GB "$title" | sed "s/\"//g")
-    dateheure=$(echo $content | grep  -Po '(?<=date: ).*(?=categories)')
-    dateheure=${dateheure::-1}
-    newdateheure="$(date +"%Y-%m-%d %T") +0100"
-    text=$(echo $content | grep  -Po '(?<=translate-->).*(?=\<!--endtranslate)')
-    
-    text=${text::-1}
-    text=${text:1}
-
-    textru=$(python3 -m deepl --auth-key=$token text --to=RU "$text")
-    texten=$(python3 -m deepl --auth-key=$token text --to=EN-GB "$text")
-    content=$(echo "$content" | sed "s/$dateheure/$newdateheure/g")
-    echo "$content" > $rep
-    contentru=$(echo "$content")
-    contentru=$(echo "$contentru"| sed "s/\"$title\"/\"$titleru\"/g")
-    contentru=$(echo "$contentru" | sed "s/$text/$textru/g")
-    contentru=$(echo "$contentru" | sed "s/source :/источник :/g")
-    echo "$contentru" > $repru
-    contenten=$(echo "$content")
-    contenten=$(echo "$contenten" | sed "s/\"$title\"/\"$titleen\"/g")
-    contenten=$(echo "$contenten" | sed "s/$text/$texten/g")
-    echo "$contenten" > $repen
+    while IFS= read -r line
+    do
+       
+      if [[ "$line" != *"<"* && "$line" != "" && "$line" != "---" 
+       && "$line" != "layout: post" && "$line" != "title: \""* 
+       && "$line" != "date: "* && "$line" != "categories: all" ]]; then
+          textru=$(python3 -m deepl --auth-key=$token text --to=RU "$line")
+          texten=$(python3 -m deepl --auth-key=$token text --to=EN-GB "$line")
+          textfr=$line
+      elif [[ "$line" == "title: \""* ]]; then
+         title=$(echo $line | grep  -Po 'title: "\K[^"]*')
+         textru=$(python3 -m deepl --auth-key=$token text --to=RU "$title" | sed "s/\"//g")
+         textru="title: \"$textru\""
+         texten=$(python3 -m deepl --auth-key=$token text --to=EN-GB "$title" | sed "s/\"//g")
+         texten="title: \"$texten\""
+         textfr=$line
+      elif [[ "$line" == "date: "* ]]; then
+         date=$(echo $line | grep  -Po '(?<=date: ).*($)')
+         dateheure=${dateheure::-1}
+         newdateheure="$(date +"%Y-%m-%d %T") +0100"
+         textru="date: $newdateheure"
+         texten="date: $newdateheure"
+         textfr="date: $newdateheure"
+      elif [[ "$line" == "source : "* ]]; then
+         texten=$line
+         textru=$(echo "$line" | sed "s/source :/источник :/g")
+         textfr=$line
+      else
+         textru=$line
+         texten=$line
+         textfr=$line
+      fi 
+      echo "$textru" >> $repru
+      echo "$texten" >> $repen
+      echo "$textfr" >> $rep
+      
+    done < <(printf '%s\n' "$content") 
 fi
 
 
@@ -103,6 +117,6 @@ url="https://www.russianliesaboutukraine.com/all/$repparse.html"
 
 sleep 120
 
-python3 twitter.py $api_key $api_secret $access_token $access_token_secret $bearer_token "$titleen" "$titleru" $url
+#python3 twitter.py $api_key $api_secret $access_token $access_token_secret $bearer_token "$titleen" "$titleru" $url
 
 bundle exec jekyll serve --livereload
