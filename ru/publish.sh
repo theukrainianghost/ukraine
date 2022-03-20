@@ -117,6 +117,6 @@ url="https://www.russianliesaboutukraine.com/all/$repparse.html"
 
 sleep 120
 
-#python3 twitter.py $api_key $api_secret $access_token $access_token_secret $bearer_token "$titleen" "$titleru" $url
+python3 twitter.py $api_key $api_secret $access_token $access_token_secret $bearer_token "$titleen" "$titleru" $url
 
 bundle exec jekyll serve --livereload
