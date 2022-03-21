@@ -20,6 +20,12 @@ api_secret="xiGb5pDeXpL1eMIURQm5900xeF8gFfEBSdngTW9QoX1Ir9EBef"
 bearer_token="AAAAAAAAAAAAAAAAAAAAACPCaAEAAAAAEiTHGe1%2FnEYgh7Lx70i8%2FnszUkQ%3DBnCQ3CB7l1yYVvZMBtOyBJk933TGogNFKSCzhMjxN4Odx8XZF5"
 access_token="1500744221191548930-gomjgwWoTfmfG5uzIjbInVelySv8sL"
 access_token_secret="c1JdvyOaobly6aC0vJtDrYymu59fVQETIourAaqsZVSSI"
+imagelink=""
+titleen=""
+titleru=""
+titlefr=""
+tags="#россия #украина #геноцид #нетвойне #StandWithUkraine #РоссияСмотри #RussiaInvadedUkraine #RussiaUkraineWar #RussianWarCrimes"
+
 
 rep=$(LANG=C diff -qr ./_i18n/fr/_posts/ ./_i18n/en/_posts/  | grep -oP "^Only in \K.*")   
 if [ -z "$rep" ]
@@ -41,11 +47,11 @@ else
           texten=$(python3 -m deepl --auth-key=$token text --to=EN-GB "$line")
           textfr=$line
       elif [[ "$line" == "title: \""* ]]; then
-         title=$(echo $line | grep  -Po 'title: "\K[^"]*')
-         textru=$(python3 -m deepl --auth-key=$token text --to=RU "$title" | sed "s/\"//g")
-         textru="title: \"$textru\""
-         texten=$(python3 -m deepl --auth-key=$token text --to=EN-GB "$title" | sed "s/\"//g")
-         texten="title: \"$texten\""
+         titlefr=$(echo $line | grep  -Po 'title: "\K[^"]*')
+         titleru=$(python3 -m deepl --auth-key=$token text --to=RU "$titlefr" | sed "s/\"//g")
+         textru="title: \"$titleru\""
+         titleen=$(python3 -m deepl --auth-key=$token text --to=EN-GB "$titlefr" | sed "s/\"//g")
+         texten="title: \"$titleen\""
          textfr=$line
       elif [[ "$line" == "date: "* ]]; then
          date=$(echo $line | grep  -Po '(?<=date: ).*($)')
@@ -58,6 +64,18 @@ else
          texten=$line
          textru=$(echo "$line" | sed "s/source :/источник :/g")
          textfr=$line
+      elif [[ "$line" == *"<img"* ]]; then
+         imagelink=$(echo $line | grep  -Po '<img src="{{ site.baseurl }}/assets/images/\K[^"]*')
+         textru=$line
+         texten=$line
+         textfr=$line
+      elif [[ "$line" == *"video/mp4"* ]]; then
+         videolink=$(echo $line | grep  -Po '<source src="{{ site.baseurl }}/assets/videos/\K[^"]*')
+         textru=$line
+         texten=$line
+         textfr=$line
+      elif [[ "$line" == *"<tags"* ]]; then
+         tags=$(echo $line | grep  -Po '<tags values="\K[^"]*')
       else
          textru=$line
          texten=$line
@@ -114,9 +132,20 @@ repparse=${rep:18}
 repparse=${repparse::-9}
 repparse=$(echo $repparse | sed "s/-/\//g")
 url="https://www.russianliesaboutukraine.com/all/$repparse.html"
+medialink=""
+if [ -n "$imagelink" ]; then
+    medialink="/home/srouaix/perso/ukraine/russianliesaboutukraine/assets/images/$imagelink"
+fi
 
-sleep 120
+if [ -n "$videolink" ]; then
+    medialink="/home/srouaix/perso/ukraine/russianliesaboutukraine/assets/videos/$videolink"
+fi
 
-python3 twitter.py $api_key $api_secret $access_token $access_token_secret $bearer_token "$titleen" "$titleru" $url
+
+url=$(twzer sh -b $url | grep  -Po '│ SHORT LINK: │ \K[^ |]*')
+
+sleep 180
+
+python3 twitter.py $api_key $api_secret $access_token $access_token_secret $bearer_token "$titlefr" "$titleen" "$titleru" "$url" "$tags" "$medialink"
 
 bundle exec jekyll serve --livereload
