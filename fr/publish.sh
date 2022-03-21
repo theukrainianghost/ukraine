@@ -144,7 +144,7 @@ fi
 
 url=$(twzer sh -b $url | grep  -Po '│ SHORT LINK: │ \K[^ |]*')
 
-sleep 180
+sleep 300
 
 python3 twitter.py $api_key $api_secret $access_token $access_token_secret $bearer_token "$titlefr" "$titleen" "$titleru" "$url" "$tags" "$medialink"
 
